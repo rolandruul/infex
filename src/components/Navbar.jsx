@@ -136,8 +136,7 @@ export default function Navbar({ variant = 'landing' }) {
             to="/dashboard"
             className="text-xl font-semibold uppercase tracking-[0.35em] text-gray-900"
           >
-            INF
-            <span className="text-primary">EX</span>
+            INFEX
           </Link>
           <div className="hidden items-center gap-4 sm:flex">
             <Link to="/dashboard" className="text-gray-600 hover:text-gray-900">
