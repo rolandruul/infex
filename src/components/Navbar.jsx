@@ -65,15 +65,15 @@ export default function Navbar({ variant = 'landing' }) {
           </Link>
           <div className="flex items-center gap-6">
             <nav className="hidden items-center gap-6 text-sm text-gray-700 sm:flex">
-              <a href="#how-it-works" className="hover:text-gray-900">
+              <Link to="/#how-it-works" className="hover:text-gray-900">
                 How it works
-              </a>
-              <a href="#example-use-case" className="hover:text-gray-900">
+              </Link>
+              <Link to="/#example-use-case" className="hover:text-gray-900">
                 Example use case
-              </a>
-              <a href="#what-users-say" className="hover:text-gray-900">
+              </Link>
+              <Link to="/#what-users-say" className="hover:text-gray-900">
                 What users say
-              </a>
+              </Link>
             </nav>
             <Link to="/login" className="hidden sm:inline-block">
               <Button variant="secondary">Login</Button>
@@ -92,27 +92,27 @@ export default function Navbar({ variant = 'landing' }) {
         {mobileOpen && (
           <div className="border-t border-gray-200 bg-white px-6 py-4 shadow-sm sm:hidden">
             <nav className="flex flex-col gap-3">
-              <a
-                href="#how-it-works"
+              <Link
+                to="/#how-it-works"
                 className="text-gray-700 hover:text-gray-900"
                 onClick={() => setMobileOpen(false)}
               >
                 How it works
-              </a>
-              <a
-                href="#example-use-case"
+              </Link>
+              <Link
+                to="/#example-use-case"
                 className="text-gray-700 hover:text-gray-900"
                 onClick={() => setMobileOpen(false)}
               >
                 Example use case
-              </a>
-              <a
-                href="#what-users-say"
+              </Link>
+              <Link
+                to="/#what-users-say"
                 className="text-gray-700 hover:text-gray-900"
                 onClick={() => setMobileOpen(false)}
               >
                 What users say
-              </a>
+              </Link>
               <Link to="/login" onClick={() => setMobileOpen(false)} className="pt-2">
                 <Button variant="secondary" className="w-full justify-center">
                   Login
