@@ -123,15 +123,17 @@ export default function Dashboard() {
             <p className="rounded-xl border border-gray-200 bg-white p-6 text-gray-500 shadow-sm">
               Loading…
             </p>
-          ) : notifications.length === 0 ? (
+          ) : notifications.filter((n) => !n.read).length === 0 ? (
             <p className="rounded-xl border border-gray-200 bg-white p-6 text-gray-500 shadow-sm">
               No alerts yet.
             </p>
           ) : (
             <div className="space-y-3">
-              {notifications.map((n) => (
-                <NotificationCard key={n.id} notification={n} onRead={refresh} />
-              ))}
+              {notifications
+                .filter((n) => !n.read)
+                .map((n) => (
+                  <NotificationCard key={n.id} notification={n} onRead={refresh} />
+                ))}
             </div>
           )}
         </section>
