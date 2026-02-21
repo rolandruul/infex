@@ -52,8 +52,7 @@ export default function Landing() {
               <div className="aspect-[9/19] overflow-hidden rounded-[1.75rem] bg-white">
                 <div className="flex h-full items-center justify-center bg-white">
                   <div className="text-xl font-semibold uppercase tracking-[0.35em] text-gray-900">
-                    INF
-                    <span className="text-primary">EX</span>
+                    INFEX
                   </div>
                 </div>
               </div>

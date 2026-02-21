@@ -51,13 +51,15 @@ export default function Navbar({ variant = 'landing' }) {
             to="/"
             className="text-xl font-semibold uppercase tracking-[0.35em] text-gray-900"
           >
-            INF
-            <span className="text-primary">EX</span>
+            INFEX
           </Link>
           <div className="flex items-center gap-6">
             <nav className="hidden items-center gap-6 text-sm text-gray-700 sm:flex">
               <a href="#how-it-works" className="hover:text-gray-900">
                 How it works
+              </a>
+              <a href="#example-use-case" className="hover:text-gray-900">
+                Example use case
               </a>
               <a href="#what-users-say" className="hover:text-gray-900">
                 What users say
@@ -86,6 +88,13 @@ export default function Navbar({ variant = 'landing' }) {
                 onClick={() => setMobileOpen(false)}
               >
                 How it works
+              </a>
+              <a
+                href="#example-use-case"
+                className="text-gray-700 hover:text-gray-900"
+                onClick={() => setMobileOpen(false)}
+              >
+                Example use case
               </a>
               <a
                 href="#what-users-say"
