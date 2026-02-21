@@ -68,43 +68,57 @@ export default function Landing() {
                       </svg>
                     </button>
                   </div>
-                  {/* Main content */}
+                  {/* Main content - Partners page */}
                   <div className="min-h-0 flex-1 overflow-auto p-2">
-                    <p className="mb-2 text-[9px] font-semibold text-gray-900">Recent Alerts</p>
+                    <p className="mb-2 text-[9px] font-semibold text-gray-900">Partners</p>
                     <div className="space-y-1.5">
-                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5">
-                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                      <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
+                        <img
+                          src="https://i.pravatar.cc/48?img=12"
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
                         <div className="min-w-0 flex-1">
-                          <p className="text-[8px] font-medium leading-tight text-gray-900">Alex (Tallinn)</p>
-                          <p className="text-[7px] text-gray-500">New condition reported</p>
+                          <p className="text-[8px] font-medium leading-tight text-gray-900">Alex</p>
+                          <p className="text-[7px] text-gray-500">Tallinn</p>
                         </div>
+                        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[6px] font-medium text-primary">Condition</span>
                       </div>
-                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5">
-                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                      <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
+                        <img
+                          src="https://i.pravatar.cc/48?img=23"
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-[8px] font-medium leading-tight text-gray-900">Jordan</p>
-                          <p className="text-[7px] text-gray-500">Review profile</p>
+                          <p className="text-[7px] text-gray-500">Helsinki</p>
                         </div>
                       </div>
-                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5 opacity-80">
-                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-gray-300" />
+                      <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
+                        <img
+                          src="https://i.pravatar.cc/48?img=32"
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-[8px] font-medium leading-tight text-gray-900">Sam</p>
-                          <p className="text-[7px] text-gray-500">Read</p>
+                          <p className="text-[7px] text-gray-500">Tartu</p>
                         </div>
+                        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[6px] font-medium text-primary">Condition</span>
                       </div>
                     </div>
                   </div>
-                  {/* Bottom navbar (mobile view) */}
+                  {/* Bottom navbar (mobile view) - Partners active */}
                   <div className="shrink-0 border-t border-gray-200 bg-white">
                     <div className="flex">
-                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-primary">
+                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-gray-400">
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
                         <span className="text-[7px] font-medium">Dashboard</span>
                       </div>
-                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-gray-400">
+                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-primary">
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
