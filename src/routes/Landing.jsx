@@ -57,10 +57,60 @@ export default function Landing() {
           <div className="flex shrink-0 justify-center lg:w-80">
             <div className="relative mx-auto w-[280px] rounded-[2.5rem] border-[10px] border-gray-800 bg-gray-800 shadow-xl">
               <div className="absolute left-1/2 top-0 h-5 w-24 -translate-x-1/2 rounded-b-2xl bg-gray-800" />
-              <div className="aspect-[9/19] overflow-hidden rounded-[1.75rem] bg-white">
-                <div className="flex h-full items-center justify-center bg-white">
-                  <div className="text-xl font-semibold uppercase tracking-[0.35em] text-gray-900">
-                    INFEX
+              <div className="aspect-[9/19] overflow-hidden rounded-[1.75rem] bg-gray-50">
+                <div className="flex h-full flex-col bg-gray-50">
+                  {/* Top bar */}
+                  <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-2 py-1.5">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-900">InfeX</span>
+                    <button type="button" className="rounded p-0.5 text-gray-600" aria-hidden>
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                    </button>
+                  </div>
+                  {/* Main content */}
+                  <div className="min-h-0 flex-1 overflow-auto p-2">
+                    <p className="mb-2 text-[9px] font-semibold text-gray-900">Recent Alerts</p>
+                    <div className="space-y-1.5">
+                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5">
+                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[8px] font-medium leading-tight text-gray-900">Alex (Tallinn)</p>
+                          <p className="text-[7px] text-gray-500">New condition reported</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5">
+                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[8px] font-medium leading-tight text-gray-900">Jordan</p>
+                          <p className="text-[7px] text-gray-500">Review profile</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1.5 rounded border border-gray-100 bg-white p-1.5 opacity-80">
+                        <span className="mt-0.5 h-1 w-1 shrink-0 rounded-full bg-gray-300" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[8px] font-medium leading-tight text-gray-900">Sam</p>
+                          <p className="text-[7px] text-gray-500">Read</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Bottom navbar (mobile view) */}
+                  <div className="shrink-0 border-t border-gray-200 bg-white">
+                    <div className="flex">
+                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-primary">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span className="text-[7px] font-medium">Dashboard</span>
+                      </div>
+                      <div className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-gray-400">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span className="text-[7px] font-medium">Partners</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
