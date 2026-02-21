@@ -42,14 +42,24 @@ function LogoutIcon() {
 export default function Navbar({ variant = 'landing' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { session, signOut } = useAuth();
+  const location = useLocation();
+
+  function handleLogoClick(e) {
+    if (location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
 
   if (variant === 'landing') {
     return (
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link
             to="/"
             className="text-xl font-semibold uppercase tracking-[0.35em] text-gray-900"
+            onClick={handleLogoClick}
           >
             INFEX
           </Link>
@@ -115,7 +125,6 @@ export default function Navbar({ variant = 'landing' }) {
     );
   }
 
-  const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
   const isPartners = location.pathname === '/partners';
 

@@ -1,10 +1,18 @@
-import { Link, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 
 export default function Landing() {
   const { session, loading } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === '/' && !location.hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname, location.hash]);
 
   if (!loading && session) {
     return <Navigate to="/dashboard" replace />;
@@ -28,7 +36,7 @@ export default function Landing() {
 
       <Navbar variant="landing" />
 
-      <main className="mx-auto max-w-5xl px-6 pb-16 pt-0 space-y-24">
+      <main className="mx-auto max-w-6xl px-6 pb-16 pt-0 space-y-24">
         <section className="flex min-h-[calc(100vh-4rem)] flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <div className="flex-1 space-y-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
@@ -65,7 +73,7 @@ export default function Landing() {
         id="how-it-works"
         className="bg-white py-24"
       >
-        <div className="mx-auto max-w-5xl px-6">
+        <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-10 text-2xl font-bold text-center text-gray-900">How It Works</h2>
           <div className="grid gap-8 sm:grid-cols-3">
             <div className="space-y-3 text-center">
@@ -172,7 +180,7 @@ export default function Landing() {
         id="what-users-say"
         className="py-24 pb-32"
       >
-        <div className="mx-auto max-w-5xl px-6">
+        <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-10 text-2xl font-bold text-gray-900 text-center">What users say</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
