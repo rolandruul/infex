@@ -11,7 +11,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen bg-white">
       <div className="pointer-events-none absolute inset-x-0 -top-32 -z-10">
         <svg
           className="h-64 w-full"

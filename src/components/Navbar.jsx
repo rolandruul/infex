@@ -45,7 +45,7 @@ export default function Navbar({ variant = 'landing' }) {
 
   if (variant === 'landing') {
     return (
-      <header className="bg-transparent">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link
             to="/"
