@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import Button from './Button';
 
@@ -41,8 +41,20 @@ function LogoutIcon() {
 
 export default function Navbar({ variant = 'landing' }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
   const { session, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handleClickOutside(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    }
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [userMenuOpen]);
 
   function handleLogoClick(e) {
     if (location.pathname === '/') {
@@ -145,14 +157,37 @@ export default function Navbar({ variant = 'landing' }) {
             <Link to="/partners" className="text-gray-600 hover:text-gray-900">
               Partners
             </Link>
-          <Link
-            to="/"
-            onClick={() => signOut()}
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Log out"
-          >
-              <LogoutIcon />
-            </Link>
+            <div className="relative border-l border-gray-200 pl-4" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-900 min-w-0 max-w-[200px]"
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+                aria-label="User menu"
+              >
+                <span className="truncate">{session?.user?.email ?? 'Account'}</span>
+                <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      signOut();
+                      navigate('/', { replace: true });
+                    }}
+                    className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <span>Log out</span>
+                    <LogoutIcon />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <button
             type="button"

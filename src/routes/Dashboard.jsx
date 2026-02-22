@@ -75,9 +75,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex h-screen flex-col bg-white sm:min-h-screen sm:h-auto">
       <Navbar variant="dashboard" />
-      <main className="mx-auto max-w-5xl px-6 py-10 pb-24 sm:pb-10">
+      <main className="flex-1 min-h-0 overflow-auto mx-auto w-full max-w-5xl px-6 py-10 pb-24 sm:pb-10">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <Button variant="primary" onClick={handleOpenModal}>

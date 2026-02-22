@@ -71,19 +71,27 @@ export default function Partners() {
           to={profileUrl}
           className="block flex-1 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 rounded-lg -m-1 p-1"
         >
-          <div className="mb-4 flex h-16 w-16 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-50">
-            {profile.photo && profile.photo.startsWith('http') ? (
-              <img src={profile.photo} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center text-sm text-gray-400">Photo</span>
-            )}
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-50">
+              {profile.photo && profile.photo.startsWith('http') ? (
+                <img src={profile.photo} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-sm text-gray-400">Photo</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-semibold text-gray-900">{profile.name}</h2>
+              <p className="text-sm text-gray-600">{profile.city}</p>
+            </div>
           </div>
-          <h2 className="font-semibold text-gray-900">{profile.name}</h2>
-          <p className="text-sm text-gray-600">{profile.city}</p>
           {profile.conditions && profile.conditions.length > 0 && (
-            <span className="mt-2 inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-              Has conditions
-            </span>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {profile.conditions.map((c) => (
+                <span key={c} className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                  {c}
+                </span>
+              ))}
+            </div>
           )}
         </Link>
         <Button
@@ -102,9 +110,9 @@ export default function Partners() {
   const hasAny = legacyProfiles.length > 0 || savedProfiles.length > 0;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex h-screen flex-col bg-white sm:min-h-screen sm:h-auto">
       <Navbar variant="dashboard" />
-      <main className="mx-auto max-w-5xl px-6 py-10 pb-24 sm:pb-10">
+      <main className="flex-1 min-h-0 overflow-auto mx-auto w-full max-w-5xl px-6 py-10 pb-24 sm:pb-10">
         <h1 className="mb-8 text-2xl font-bold text-gray-900">Partners</h1>
         {loading ? (
           <p className="text-gray-500">Loading…</p>

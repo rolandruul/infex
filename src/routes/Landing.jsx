@@ -214,7 +214,7 @@ export default function Landing() {
             </div>
 
             {/* Right: Product preview mock */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="mt-12 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm md:mt-0">
               <div className="mb-4 flex items-center justify-between">
                 <span className="font-semibold text-gray-900">Recent Alerts</span>
                 <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-white">New</span>
@@ -265,8 +265,13 @@ export default function Landing() {
               <p className="text-gray-600">
                 "Simple and clear. I finally have a place to track who in my circle has reported something."
               </p>
-              <p className="mt-4 font-medium text-gray-900">Maya K.</p>
-              <p className="text-sm text-gray-500">Healthcare worker</p>
+              <div className="mt-4 flex items-center gap-3">
+                <img src="https://i.pravatar.cc/64?img=47" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                <div>
+                  <p className="font-medium text-gray-900">Maya K.</p>
+                  <p className="text-sm text-gray-500">Healthcare worker</p>
+                </div>
+              </div>
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
               <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
@@ -279,8 +284,13 @@ export default function Landing() {
               <p className="text-gray-600">
                 "No clutter, no drama. Just the information I need to make better decisions."
               </p>
-              <p className="mt-4 font-medium text-gray-900">James T.</p>
-              <p className="text-sm text-gray-500">Parent</p>
+              <div className="mt-4 flex items-center gap-3">
+                <img src="https://i.pravatar.cc/64?img=12" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                <div>
+                  <p className="font-medium text-gray-900">James T.</p>
+                  <p className="text-sm text-gray-500">Parent</p>
+                </div>
+              </div>
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:col-span-2 lg:col-span-1">
               <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
@@ -293,8 +303,13 @@ export default function Landing() {
               <p className="text-gray-600">
                 "Fits into my routine. Add contacts, log when something comes up, get notified. Done."
               </p>
-              <p className="mt-4 font-medium text-gray-900">Sarah L.</p>
-              <p className="text-sm text-gray-500">Small business owner</p>
+              <div className="mt-4 flex items-center gap-3">
+                <img src="https://i.pravatar.cc/64?img=32" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                <div>
+                  <p className="font-medium text-gray-900">Sarah L.</p>
+                  <p className="text-sm text-gray-500">Small business owner</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
