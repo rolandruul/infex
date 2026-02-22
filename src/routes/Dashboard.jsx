@@ -170,6 +170,23 @@ export default function Dashboard() {
             </div>
           )}
         </section>
+
+        <section className="mt-10">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">History</h2>
+          {!loading && notifications.filter((n) => n.read).length === 0 ? (
+            <p className="rounded-xl border border-gray-200 bg-white p-6 text-gray-500 shadow-sm">
+              No history.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {notifications
+                .filter((n) => n.read)
+                .map((n) => (
+                  <NotificationCard key={n.id} notification={n} onRead={refresh} variant="hide" />
+                ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import Navbar from '../components/Navbar';
@@ -7,6 +7,10 @@ import Button from '../components/Button';
 export default function Landing() {
   const { session, loading } = useAuth();
   const location = useLocation();
+
+  const carouselRef = useRef(null);
+  const carouselDirectionRef = useRef(1); // 1 = right, -1 = left
+  const [carouselItemWidth, setCarouselItemWidth] = useState(320);
 
   useEffect(() => {
     if (location.pathname !== '/') return;
@@ -20,6 +24,57 @@ export default function Landing() {
       setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
     }
   }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.querySelector('[data-carousel-card]');
+    if (card) setCarouselItemWidth(card.offsetWidth);
+  }, []);
+
+  const TESTIMONIALS = [
+    { quote: 'Simple and clear. I finally have a place to track who in my circle has reported something.', name: 'Maya K.', title: 'Healthcare worker', img: 47 },
+    { quote: 'No clutter, no drama. Just the information I need to make better decisions.', name: 'James T.', title: 'Parent', img: 12 },
+    { quote: 'Fits into my routine. Add contacts, log when something comes up, get notified. Done.', name: 'Sarah L.', title: 'Small business owner', img: 32 },
+    { quote: 'Finally something that respects my privacy while still keeping me in the loop.', name: 'Alex R.', title: 'Software engineer', img: 33 },
+    { quote: 'I recommended it to my whole group. Everyone uses it now.', name: 'Jordan M.', title: 'Community organizer', img: 45 },
+    { quote: 'The alerts are timely and the app is easy to use. Exactly what I needed.', name: 'Sam P.', title: 'Teacher', img: 22 },
+    { quote: 'Clean design, does one thing well. No bloat.', name: 'Casey L.', title: 'Designer', img: 16 },
+  ];
+  const CAROUSEL_GAP = 24;
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const step = carouselItemWidth + CAROUSEL_GAP;
+    const maxScroll = () => Math.max(0, el.scrollWidth - el.clientWidth);
+
+    const timer = setInterval(() => {
+      const max = maxScroll();
+      const dir = carouselDirectionRef.current;
+      const left = el.scrollLeft;
+
+      if (dir === 1) {
+        const next = left + step;
+        if (next >= max - 1) {
+          el.scrollTo({ left: max, behavior: 'smooth' });
+          carouselDirectionRef.current = -1;
+        } else {
+          el.scrollTo({ left: next, behavior: 'smooth' });
+        }
+      } else {
+        const next = left - step;
+        if (next <= 1) {
+          el.scrollTo({ left: 0, behavior: 'smooth' });
+          carouselDirectionRef.current = 1;
+        } else {
+          el.scrollTo({ left: next, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [carouselItemWidth]);
 
   if (!loading && session) {
     return <Navigate to="/dashboard" replace />;
@@ -253,64 +308,33 @@ export default function Landing() {
       >
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-10 text-2xl font-bold text-gray-900 text-center">What users say</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <svg key={i} className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-600">
-                "Simple and clear. I finally have a place to track who in my circle has reported something."
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <img src="https://i.pravatar.cc/64?img=47" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
-                <div>
-                  <p className="font-medium text-gray-900">Maya K.</p>
-                  <p className="text-sm text-gray-500">Healthcare worker</p>
+          <div
+            ref={carouselRef}
+            className="scrollbar-hide flex gap-6 overflow-x-auto overflow-y-hidden pb-2 scroll-smooth snap-x snap-mandatory"
+          >
+            {TESTIMONIALS.map((item, idx) => (
+              <div
+                key={`${item.name}-${idx}`}
+                data-carousel-card
+                className="w-[85vw] min-w-[85vw] shrink-0 snap-start rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:min-w-[380px] sm:w-[380px]"
+              >
+                <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <svg key={i} className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-600">"{item.quote}"</p>
+                <div className="mt-4 flex items-center gap-3">
+                  <img src={`https://i.pravatar.cc/64?img=${item.img}`} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                  <div>
+                    <p className="font-medium text-gray-900">{item.name}</p>
+                    <p className="text-sm text-gray-500">{item.title}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <svg key={i} className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-600">
-                "No clutter, no drama. Just the information I need to make better decisions."
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <img src="https://i.pravatar.cc/64?img=12" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
-                <div>
-                  <p className="font-medium text-gray-900">James T.</p>
-                  <p className="text-sm text-gray-500">Parent</p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:col-span-2 lg:col-span-1">
-              <div className="mb-3 flex gap-0.5 text-amber-400" aria-hidden>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <svg key={i} className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-gray-600">
-                "Fits into my routine. Add contacts, log when something comes up, get notified. Done."
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <img src="https://i.pravatar.cc/64?img=32" alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
-                <div>
-                  <p className="font-medium text-gray-900">Sarah L.</p>
-                  <p className="text-sm text-gray-500">Small business owner</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

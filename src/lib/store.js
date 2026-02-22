@@ -99,7 +99,7 @@ export async function getSavedProfiles() {
   const globalIds = [...new Set(links.map((l) => l.global_id))];
   const { data: identities, error: identError } = await supabase
     .from('global_identities')
-    .select('id, name, city, photo_hash, original_photo_url, extracted_notes, conditions')
+    .select('id, name, city, photo_hash, original_photo_url, extracted_notes, conditions, updated_at, created_at')
     .in('id', globalIds);
   if (identError) throw identError;
   const byId = Object.fromEntries((identities || []).map((i) => [i.id, i]));
@@ -116,6 +116,7 @@ export async function getSavedProfiles() {
       conditions: g.conditions || [],
       notes: g.extracted_notes || '',
       addedAt: l.added_at,
+      lastConditionAt: g.updated_at ?? g.created_at ?? null,
     };
   }).filter(Boolean);
 }
@@ -238,6 +239,7 @@ export async function getProfiles() {
     photo: row.photo || '',
     conditions: row.conditions || [],
     notes: row.notes || '',
+    lastConditionAt: row.updated_at ?? row.created_at,
   }));
 }
 
@@ -396,14 +398,53 @@ export async function getNotifications() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return (data || []).map((row) => ({
+  const list = (data || []).map((row) => ({
     id: row.id,
     profileId: row.profile_id,
     profileGlobalId: row.profile_global_id ?? null,
     profileName: row.profile_name,
     message: row.message,
     read: row.read ?? false,
+    createdAt: row.created_at,
   }));
+
+  const globalIds = [...new Set(list.map((n) => n.profileGlobalId).filter(Boolean))];
+  const profileIds = [...new Set(list.map((n) => n.profileId).filter(Boolean))];
+  const photoByGlobal = {};
+  const photoByProfile = {};
+  const conditionCountByGlobal = {};
+  const conditionCountByProfile = {};
+
+  if (globalIds.length > 0) {
+    const { data: identities } = await supabase
+      .from('global_identities')
+      .select('id, original_photo_url, conditions')
+      .in('id', globalIds);
+    (identities || []).forEach((i) => {
+      photoByGlobal[i.id] = i.original_photo_url || null;
+      conditionCountByGlobal[i.id] = (i.conditions || []).length;
+    });
+  }
+  if (profileIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, photo, conditions')
+      .in('id', profileIds)
+      .eq('user_id', user.id);
+    (profiles || []).forEach((p) => {
+      photoByProfile[p.id] = p.photo || null;
+      conditionCountByProfile[p.id] = (p.conditions || []).length;
+    });
+  }
+
+  return list.map((n) => {
+    const conditionCount = (n.profileGlobalId && conditionCountByGlobal[n.profileGlobalId]) ?? (n.profileId && conditionCountByProfile[n.profileId]) ?? 0;
+    return {
+      ...n,
+      photo: (n.profileGlobalId && photoByGlobal[n.profileGlobalId]) || (n.profileId && photoByProfile[n.profileId]) || null,
+      isBiohazard: conditionCount > 1,
+    };
+  });
 }
 
 export async function addNotification(notification) {
@@ -426,4 +467,15 @@ export async function markNotificationRead(id) {
     .update({ read: true })
     .eq('id', id)
     .eq('user_id', user.id);
+}
+
+export async function deleteNotification(id) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const { error } = await supabase
+    .from('notifications')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
+  if (error) throw error;
 }
