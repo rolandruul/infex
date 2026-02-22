@@ -4,7 +4,7 @@ import Button from './Button';
 
 export default function NotificationCard({ notification, onRead }) {
   const navigate = useNavigate();
-  const { id, profileId, profileName, message, read } = notification;
+  const { id, profileId, profileGlobalId, profileName, message, read } = notification;
 
   async function handleSeen(e) {
     e.stopPropagation();
@@ -17,7 +17,9 @@ export default function NotificationCard({ notification, onRead }) {
   }
 
   function handleCardClick() {
-    navigate(`/profile/${profileId}`);
+    if (profileGlobalId) navigate(`/profile/global/${profileGlobalId}`);
+    else if (profileId) navigate(`/profile/${profileId}`);
+    else navigate('/partners');
   }
 
   return (

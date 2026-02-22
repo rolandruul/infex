@@ -1,5 +1,201 @@
 import { supabase } from './supabase';
 
+// --- Image-to-Profile importer (global_identities + user_saved_profiles) ---
+
+/** Hash image bytes (SHA-256) for deduplication. Returns hex string. */
+export async function hashImageBytes(arrayBuffer) {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Call Edge Function to extract name, city, notes from image via GPT-4o Vision. */
+export async function extractProfileFromImage(imageBase64) {
+  const { data, error } = await supabase.functions.invoke('extract-profile-from-image', {
+    body: { image: imageBase64 },
+  });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return {
+    name: data.name ?? 'Unknown',
+    city: data.city ?? '',
+    extracted_notes: data.extracted_notes ?? undefined,
+  };
+}
+
+/** Find existing global_identity by photo_hash or by name+city. */
+export async function findExistingGlobalIdentity(photoHash, name, city) {
+  if (!name && !city && !photoHash) return null;
+  let query = supabase.from('global_identities').select('id, name, city').limit(1);
+  if (photoHash) {
+    const { data } = await query.eq('photo_hash', photoHash).maybeSingle();
+    if (data) return data;
+  }
+  const n = (name || '').trim();
+  const c = (city || '').trim();
+  if (n) {
+    const { data } = await supabase
+      .from('global_identities')
+      .select('id, name, city')
+      .ilike('name', n)
+      .ilike('city', c)
+      .limit(1)
+      .maybeSingle();
+    if (data) return data;
+  }
+  return null;
+}
+
+/** Create global_identity and link to current user. Returns the saved profile row (for UI). */
+export async function importProfileFromImage({ name, city, extracted_notes, photo_hash, original_photo_url }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const existing = await findExistingGlobalIdentity(photo_hash, name, city);
+  let globalId;
+
+  if (existing) {
+    globalId = existing.id;
+  } else {
+    const { data: inserted, error: insertError } = await supabase
+      .from('global_identities')
+      .insert({
+        name: name || 'Unknown',
+        city: city || '',
+        photo_hash: photo_hash || null,
+        original_photo_url: original_photo_url || null,
+        extracted_notes: extracted_notes || null,
+      })
+      .select('id')
+      .single();
+    if (insertError) throw insertError;
+    globalId = inserted.id;
+  }
+
+  const { data: link, error: linkError } = await supabase
+    .from('user_saved_profiles')
+    .insert({ user_id: user.id, global_id: globalId })
+    .select('id, global_id, added_at')
+    .single();
+  if (linkError) {
+    if (linkError.code === '23505') return { id: link?.id, globalId, alreadySaved: true };
+    throw linkError;
+  }
+  return { id: link.id, globalId, alreadySaved: false };
+}
+
+/** Get saved profiles (user_saved_profiles joined with global_identities) for current user. */
+export async function getSavedProfiles() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data: links, error: linkError } = await supabase
+    .from('user_saved_profiles')
+    .select('id, global_id, added_at')
+    .eq('user_id', user.id)
+    .order('added_at', { ascending: false });
+  if (linkError) throw linkError;
+  if (!links?.length) return [];
+
+  const globalIds = [...new Set(links.map((l) => l.global_id))];
+  const { data: identities, error: identError } = await supabase
+    .from('global_identities')
+    .select('id, name, city, photo_hash, original_photo_url, extracted_notes, conditions')
+    .in('id', globalIds);
+  if (identError) throw identError;
+  const byId = Object.fromEntries((identities || []).map((i) => [i.id, i]));
+
+  return links.map((l) => {
+    const g = byId[l.global_id];
+    if (!g) return null;
+    return {
+      id: l.id,
+      globalId: g.id,
+      name: g.name,
+      city: g.city || '',
+      photo: g.original_photo_url || (g.photo_hash ? 'hash' : ''),
+      conditions: g.conditions || [],
+      notes: g.extracted_notes || '',
+      addedAt: l.added_at,
+    };
+  }).filter(Boolean);
+}
+
+/** Remove a saved profile (unlink from user). */
+export async function deleteSavedProfile(linkId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { error } = await supabase
+    .from('user_saved_profiles')
+    .delete()
+    .eq('id', linkId)
+    .eq('user_id', user.id);
+  if (error) throw error;
+}
+
+/** Get a global identity by id (for profile view). */
+export async function getGlobalIdentity(globalId) {
+  const { data, error } = await supabase
+    .from('global_identities')
+    .select('id, name, city, original_photo_url, extracted_notes, conditions')
+    .eq('id', globalId)
+    .single();
+  if (error || !data) return null;
+  return {
+    id: data.id,
+    name: data.name,
+    city: data.city || '',
+    photo: data.original_photo_url || '',
+    notes: data.extracted_notes || '',
+    conditions: data.conditions || [],
+  };
+}
+
+/** Add a condition to a global identity. All users who have this identity saved get a notification (via Edge Function). Falls back to DB update + notify current user if the function is unreachable. */
+export async function addGlobalIdentityCondition(globalId, condition) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const value = (condition || '').trim();
+  if (!value) return { conditions: [] };
+
+  const { data, error } = await supabase.functions.invoke('add-global-identity-condition', {
+    body: { globalId, condition: value },
+  });
+
+  const isFetchError = error?.name === 'FunctionsFetchError' || error?.message?.includes('Failed to send');
+  if (isFetchError) {
+    const { data: row, error: fetchErr } = await supabase
+      .from('global_identities')
+      .select('conditions')
+      .eq('id', globalId)
+      .single();
+    if (fetchErr || !row) throw new Error('Profile not found');
+    const next = [...(row.conditions || []), value];
+    const { error: updateErr } = await supabase
+      .from('global_identities')
+      .update({ conditions: next })
+      .eq('id', globalId);
+    if (updateErr) throw updateErr;
+    return { conditions: next };
+  }
+
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return { conditions: data?.conditions ?? [] };
+}
+
+/** Get the current user's link id for a global identity (for Remove from list). */
+export async function getSavedProfileLinkId(globalId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from('user_saved_profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('global_id', globalId)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
 // --- Auth (used via Supabase client; session from supabase.auth.getSession()) ---
 
 export async function signIn(email, password) {
@@ -65,40 +261,67 @@ export async function getProfile(id) {
   };
 }
 
+const PROFILE_PHOTOS_BUCKET = 'profile-photos';
+
+/** Upload a profile photo to storage; returns the public URL. Create bucket "profile-photos" (public) in Dashboard if needed. */
+export async function uploadProfilePhoto(file) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = `${user.id}/${Date.now()}.${ext || 'jpg'}`;
+  const { error } = await supabase.storage.from(PROFILE_PHOTOS_BUCKET).upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data: { publicUrl } } = supabase.storage.from(PROFILE_PHOTOS_BUCKET).getPublicUrl(path);
+  return publicUrl;
+}
+
+/** Add a partner: match by name+city to existing global_identity (then link user) or create new. Conditions notify all linked users. */
 export async function addProfile(profile) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
-  const conditions = profile.condition ? [profile.condition] : [];
-  const { data: inserted, error: insertError } = await supabase
-    .from('profiles')
-    .insert({
-      user_id: user.id,
-      name: profile.name || '',
-      city: profile.city || '',
-      photo: profile.photo || '',
-      conditions,
-      notes: profile.notes || '',
-    })
-    .select()
-    .single();
-  if (insertError) throw insertError;
-  if (profile.condition) {
-    await supabase.from('notifications').insert({
-      user_id: user.id,
-      profile_id: inserted.id,
-      profile_name: inserted.name,
-      message: `New condition reported: ${profile.condition}`,
-      read: false,
-    });
+  const name = (profile.name || '').trim();
+  const city = (profile.city || '').trim();
+  if (!name) throw new Error('Name is required');
+
+  const existing = await findExistingGlobalIdentity(null, name, city);
+  let globalId;
+
+  if (existing) {
+    globalId = existing.id;
+    const { error: linkError } = await supabase
+      .from('user_saved_profiles')
+      .insert({ user_id: user.id, global_id: globalId })
+      .select('id')
+      .single();
+    if (linkError && linkError.code !== '23505') throw linkError; // 23505 = already linked
+  } else {
+    const { data: inserted, error: insertError } = await supabase
+      .from('global_identities')
+      .insert({
+        name,
+        city,
+        photo_hash: null,
+        original_photo_url: profile.photoUrl || null,
+        extracted_notes: (profile.notes || '').trim() || null,
+        conditions: [],
+      })
+      .select('id')
+      .single();
+    if (insertError) throw insertError;
+    globalId = inserted.id;
+    await supabase
+      .from('user_saved_profiles')
+      .insert({ user_id: user.id, global_id: globalId });
   }
-  return {
-    id: inserted.id,
-    name: inserted.name,
-    city: inserted.city || '',
-    photo: inserted.photo || '',
-    conditions: inserted.conditions || [],
-    notes: inserted.notes || '',
-  };
+
+  if (profile.condition && (profile.condition = (profile.condition || '').trim())) {
+    await addGlobalIdentityCondition(globalId, profile.condition);
+  }
+
+  return { globalId, name, city };
 }
 
 export async function deleteProfile(id) {
@@ -176,6 +399,7 @@ export async function getNotifications() {
   return (data || []).map((row) => ({
     id: row.id,
     profileId: row.profile_id,
+    profileGlobalId: row.profile_global_id ?? null,
     profileName: row.profile_name,
     message: row.message,
     read: row.read ?? false,

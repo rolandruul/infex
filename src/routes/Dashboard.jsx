@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
-import { getNotifications, addProfile } from '../lib/store';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { getNotifications, addProfile, uploadProfilePhoto } from '../lib/store';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -16,6 +16,9 @@ export default function Dashboard() {
     condition: '',
     notes: '',
   });
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const photoInputRef = useRef(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -34,7 +37,16 @@ export default function Dashboard() {
 
   function handleOpenModal() {
     setForm({ name: '', city: '', condition: '', notes: '' });
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    if (photoInputRef.current) photoInputRef.current.value = '';
     setModalOpen(true);
+  }
+
+  function handlePhotoChange(e) {
+    const file = e.target.files?.[0];
+    setPhotoFile(file || null);
+    setPhotoPreview(file ? URL.createObjectURL(file) : null);
   }
 
   function handleCloseModal() {
@@ -44,11 +56,16 @@ export default function Dashboard() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
+      let photoUrl = null;
+      if (photoFile) {
+        photoUrl = await uploadProfilePhoto(photoFile);
+      }
       await addProfile({
         name: form.name,
         city: form.city,
         condition: form.condition || undefined,
         notes: form.notes,
+        photoUrl,
       });
       handleCloseModal();
       await refresh();
@@ -72,8 +89,24 @@ export default function Dashboard() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Photo</label>
-              <div className="flex h-24 w-24 items-center justify-center rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-500">
-                Upload
+              <div className="flex items-center gap-4">
+                <label className="flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-50 text-sm text-gray-500 transition hover:bg-gray-100">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span>Upload</span>
+                  )}
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={handlePhotoChange}
+                  />
+                </label>
+                <div className="text-sm text-gray-500">
+                  {photoFile ? photoFile.name : 'Choose an image'}
+                </div>
               </div>
             </div>
             <Input

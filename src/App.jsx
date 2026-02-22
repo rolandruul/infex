@@ -6,6 +6,7 @@ import Register from './routes/Register';
 import Dashboard from './routes/Dashboard';
 import Partners from './routes/Partners';
 import Profile from './routes/Profile';
+import ProfileGlobal from './routes/ProfileGlobal';
 
 function ProtectedRoute({ children }) {
   const { session, loading } = useAuth();
@@ -43,6 +44,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Partners />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/global/:id"
+            element={
+              <ProtectedRoute>
+                <ProfileGlobal />
               </ProtectedRoute>
             }
           />
