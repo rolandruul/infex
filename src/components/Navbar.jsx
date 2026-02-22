@@ -80,6 +80,9 @@ export default function Navbar({ variant = 'landing' }) {
               <Link to="/#how-it-works" className="hover:text-gray-900">
                 How it works
               </Link>
+              <Link to="/#purity-rating" className="hover:text-gray-900">
+                Purity rating
+              </Link>
               <Link to="/#example-use-case" className="hover:text-gray-900">
                 Example use case
               </Link>
@@ -110,6 +113,13 @@ export default function Navbar({ variant = 'landing' }) {
                 onClick={() => setMobileOpen(false)}
               >
                 How it works
+              </Link>
+              <Link
+                to="/#purity-rating"
+                className="text-gray-700 hover:text-gray-900"
+                onClick={() => setMobileOpen(false)}
+              >
+                Purity rating
               </Link>
               <Link
                 to="/#example-use-case"

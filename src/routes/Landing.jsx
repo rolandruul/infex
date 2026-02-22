@@ -235,6 +235,63 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Purity Rating - Public Safety Scanner */}
+      <section id="purity-rating" className="bg-white pt-28 pb-28">
+        <style>{`
+          @keyframes scanline {
+            0% { top: 0; }
+            100% { top: 100%; }
+          }
+        `}</style>
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="mb-10 text-2xl font-bold text-center text-gray-900">Purity Rating</h2>
+          <p className="mb-12 text-center text-gray-600 max-w-2xl mx-auto">
+            Our Public Safety Scanner helps you understand risk levels at a glance.
+          </p>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {/* Pure */}
+            <div className="relative rounded-xl border-2 border-emerald-500 bg-white p-6 text-center shadow-sm transition hover:shadow-md">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                  <path fillRule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.75.75 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.053 8.159a.75.75 0 00-1.138-.093l-2.269 2.47-1.194-1.195a.75.75 0 101.061-1.06l1.663 1.662 2.825-3.078a.75.75 0 00-.088-1.055z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="mt-4 font-semibold text-gray-900">Pure</h3>
+              <p className="mt-2 text-sm text-gray-600">No reported conditions. Profile shows a clean scan.</p>
+            </div>
+
+            {/* Suspicious */}
+            <div className="relative rounded-xl border-2 border-amber-400 bg-white p-6 text-center shadow-sm transition hover:shadow-md">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-400/10 text-amber-600">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                  <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h3 className="mt-4 font-semibold text-gray-900">Suspicious</h3>
+              <p className="mt-2 text-sm text-gray-600">One reported condition. Proceed with caution.</p>
+            </div>
+
+            {/* Biohazard */}
+            <div className="relative rounded-xl border-2 border-red-500 bg-white p-6 text-center shadow-sm animate-pulse overflow-hidden">
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+                <div
+                  className="absolute left-0 right-0 h-8 bg-gradient-to-b from-transparent via-white/50 to-transparent"
+                  style={{ animation: 'scanline 3s linear infinite' }}
+                />
+              </div>
+              <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-600 text-2xl font-bold">
+                ☣
+              </div>
+              <h3 className="relative mt-4 font-semibold text-gray-900">Biohazard</h3>
+              <p className="relative mt-2 text-sm text-gray-600">Multiple conditions reported. High risk—review before connecting.</p>
+            </div>
+          </div>
+          <p className="mt-10 text-center text-xs text-gray-500 max-w-xl mx-auto">
+            Data is based on community reports and verified scans. Always practice safe swiping.
+          </p>
+        </div>
+      </section>
+
       {/* Example use case */}
       <section id="example-use-case" className="bg-white py-28">
         <div className="mx-auto max-w-6xl px-6">

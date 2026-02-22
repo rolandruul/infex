@@ -161,13 +161,26 @@ export default function Dashboard() {
               No alerts yet.
             </p>
           ) : (
-            <div className="space-y-3">
-              {notifications
-                .filter((n) => !n.read)
-                .map((n) => (
-                  <NotificationCard key={n.id} notification={n} onRead={refresh} />
-                ))}
-            </div>
+            <>
+              <div className="space-y-3">
+                {notifications
+                  .filter((n) => !n.read)
+                  .map((n) => (
+                    <NotificationCard key={n.id} notification={n} onRead={refresh} />
+                  ))}
+              </div>
+              <a
+                href="https://seksuaaltervis.ee/kusi-nou/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 rounded"
+              >
+                Redeem your purity
+                <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+            </>
           )}
         </section>
 
