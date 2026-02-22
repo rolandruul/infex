@@ -142,7 +142,7 @@ export default function Landing() {
 
       <section
         id="how-it-works"
-        className="bg-white py-24"
+        className="bg-white pt-32 pb-28"
       >
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-10 text-2xl font-bold text-center text-gray-900">How It Works</h2>
@@ -181,7 +181,7 @@ export default function Landing() {
       </section>
 
       {/* Example use case */}
-      <section id="example-use-case" className="bg-white py-20">
+      <section id="example-use-case" className="bg-white py-28">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-2 text-center text-2xl font-bold text-gray-900">Example use case</h2>
           <p className="mb-12 text-center text-gray-600">
@@ -249,7 +249,7 @@ export default function Landing() {
 
       <section
         id="what-users-say"
-        className="py-24 pb-32"
+        className="pt-28 pb-48"
       >
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="mb-10 text-2xl font-bold text-gray-900 text-center">What users say</h2>
