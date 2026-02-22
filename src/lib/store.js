@@ -99,7 +99,7 @@ export async function getSavedProfiles() {
   const globalIds = [...new Set(links.map((l) => l.global_id))];
   const { data: identities, error: identError } = await supabase
     .from('global_identities')
-    .select('id, name, city, photo_hash, original_photo_url, extracted_notes, conditions, updated_at, created_at')
+    .select('id, name, city, photo_hash, original_photo_url, extracted_notes, conditions, updated_at, created_at, instagram')
     .in('id', globalIds);
   if (identError) throw identError;
   const byId = Object.fromEntries((identities || []).map((i) => [i.id, i]));
@@ -117,6 +117,7 @@ export async function getSavedProfiles() {
       notes: g.extracted_notes || '',
       addedAt: l.added_at,
       lastConditionAt: g.updated_at ?? g.created_at ?? null,
+      instagram: g.instagram || '',
     };
   }).filter(Boolean);
 }
@@ -137,7 +138,7 @@ export async function deleteSavedProfile(linkId) {
 export async function getGlobalIdentity(globalId) {
   const { data, error } = await supabase
     .from('global_identities')
-    .select('id, name, city, original_photo_url, extracted_notes, conditions')
+    .select('id, name, city, original_photo_url, extracted_notes, conditions, instagram')
     .eq('id', globalId)
     .single();
   if (error || !data) return null;
@@ -148,7 +149,25 @@ export async function getGlobalIdentity(globalId) {
     photo: data.original_photo_url || '',
     notes: data.extracted_notes || '',
     conditions: data.conditions || [],
+    instagram: data.instagram || '',
   };
+}
+
+/** Update a global identity (e.g. instagram). Authenticated users can update. */
+export async function updateGlobalIdentity(globalId, updates) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const set = {};
+  if (updates.instagram !== undefined) set.instagram = (updates.instagram || '').trim().replace(/^@/, '');
+  if (Object.keys(set).length === 0) return null;
+  const { data, error } = await supabase
+    .from('global_identities')
+    .update(set)
+    .eq('id', globalId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data ? { instagram: data.instagram || '' } : null;
 }
 
 /** Add a condition to a global identity. All users who have this identity saved get a notification (via Edge Function). Falls back to DB update + notify current user if the function is unreachable. */
@@ -240,6 +259,7 @@ export async function getProfiles() {
     conditions: row.conditions || [],
     notes: row.notes || '',
     lastConditionAt: row.updated_at ?? row.created_at,
+    instagram: row.instagram || '',
   }));
 }
 
@@ -260,6 +280,7 @@ export async function getProfile(id) {
     photo: data.photo || '',
     conditions: data.conditions || [],
     notes: data.notes || '',
+    instagram: data.instagram || '',
   };
 }
 
@@ -361,6 +382,7 @@ export async function updateProfile(id, updates) {
       ...(updates.photo !== undefined && { photo: updates.photo }),
       ...(updates.conditions !== undefined && { conditions: updates.conditions }),
       ...(updates.notes !== undefined && { notes: updates.notes }),
+      ...(updates.instagram !== undefined && { instagram: updates.instagram }),
     })
     .eq('id', id)
     .eq('user_id', user.id)
@@ -384,6 +406,7 @@ export async function updateProfile(id, updates) {
     photo: updated.photo || '',
     conditions: updated.conditions || [],
     notes: updated.notes || '',
+    instagram: updated.instagram || '',
   };
 }
 
